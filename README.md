@@ -35,3 +35,7 @@ as of 11/25/2023
     - In ICLR 24 sub, compared with more models: https://openreview.net/forum?id=2msbbX3ydD
 - OPT_Questioner https://github.com/johncaged/OPT_Questioner
     - no weight
+
+## Evaluate
+
+See [docs/USAGE.md](docs/USAGE.md]).

@@ -1,0 +1,17 @@
+hydra-core==1.3.2
+transformers==4.30.2
+fvcore==0.1.5.post20221221
+python-dotenv==1.0.0
+datasets==2.15.0
+tokenizers==0.13.3
+
+# pycocotools
+# wandb==0.15.5
+# accelerate==0.21.0
+# scripts/tools/utils
+# deepspeed==0.10.2 
+# sentencepiece==0.1.99
+# evaluate==0.4.1 
+# nltk==3.8.1
+# git+https://github.com/cocodataset/panopticapi.git@7bb4655
+# timm==0.9.11

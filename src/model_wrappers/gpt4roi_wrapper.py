@@ -56,6 +56,8 @@ class GPT4ROIModelWrapper:
             self.chat_history = []
 
         else:
+            if not os.path.exists(model_name):
+                raise ValueError(f"model path {model_name} does not exist")
             self.build_model(model_name)
 
     def build_model(self, model_name):

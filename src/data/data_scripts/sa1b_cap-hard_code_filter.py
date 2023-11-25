@@ -381,7 +381,7 @@ class SA1BCap(datasets.GeneratorBasedBuilder):
             return False
         if annot_obj.get("clip_score", None) is not None:
             # NOTE: the format is from
-            # https://zeliuwestus2.blob.core.windows.net/v-xiaokhuang/data/sa1b_data/sa1b-git_caption-clip_score-tsv/sa1b-cap-0.clip-truncation.083123.tsv
+            # https://?.blob.core.windows.net/?/data/sa1b_data/sa1b-git_caption-clip_score-tsv/sa1b-cap-0.clip-truncation.083123.tsv
             # The format is List[Dict[str, float]], which is subject to change.
             clip_score = annot_obj["clip_score"][0]["clip_score"]
             if clip_score < 0.21:

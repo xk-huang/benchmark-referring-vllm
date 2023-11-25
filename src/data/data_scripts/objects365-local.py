@@ -124,7 +124,7 @@ class Objects365Dataset(datasets.GeneratorBasedBuilder):
                 "This script is supposed to work with local (downloaded) objects356 dataset. The argument `objects365_base_annotations_dir` in `load_dataset()` is required."
             )
 
-        # NOTE: the config is from https://zeliuwestus2.blob.core.windows.net/aml/amldata/objects365_v2/, which is provided by YT Lin.
+        # NOTE: the config is from https://?.blob.core.windows.net/?/amldata/objects365_v2/, which is provided by YT Lin.
         # Which is different from the original one.
         _DL_URLS = {
             "train": objects365_base_dir,
@@ -184,7 +184,7 @@ class Objects365Dataset(datasets.GeneratorBasedBuilder):
                 "width": img["width"],
                 "image_id": img["id"],
             }
-            # NOTE: the config is from https://zeliuwestus2.blob.core.windows.net/aml/amldata/objects365_v2/, which is provided by YT Lin.
+            # NOTE: the config is from https://?.blob.core.windows.net/?/amldata/objects365_v2/, which is provided by YT Lin.
             # Which is different from the original one.
             image_dict = {"image": os.path.join(image_dir, split, img["file_name"])} if self.config.with_image else {}
 

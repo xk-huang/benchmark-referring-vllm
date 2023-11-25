@@ -124,8 +124,7 @@ class V3DetDataset(datasets.GeneratorBasedBuilder):
                 "This script is supposed to work with local (downloaded) objects356 dataset. The argument `v3det_base_annotations_dir` in `load_dataset()` is required."
             )
 
-        # NOTE: the config is from https://bingdatawu2.blob.core.windows.net/onemodel/data_raw/V3Det/, which is provided by XK Huang.
-        # Which is different from the original one.
+        # NOTE: the config is from https://?.blob.core.windows.net/?/data_raw/V3Det/, which is provided by XK Huang.
         _DL_URLS = {
             "train": v3det_base_dir,
             "val": v3det_base_dir,
@@ -194,8 +193,7 @@ class V3DetDataset(datasets.GeneratorBasedBuilder):
                 "width": img["width"],
                 "image_id": img["id"],
             }
-            # NOTE: the config is from https://bingdatawu2.blob.core.windows.net/onemodel/data_raw/V3Det/, which is provided by XK Huang.
-            # Which is different from the original one.
+            # NOTE: the config is from https://?.blob.core.windows.net/?/data_raw/V3Det/, which is provided by XK Huang.
             image_dict = {"image": os.path.join(image_dir, img["file_name"])} if self.config.with_image else {}
 
             if img["file_name"] in self.MISSING_IMAGES:

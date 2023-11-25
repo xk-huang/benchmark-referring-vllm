@@ -21,3 +21,4 @@ docs/
 *.gif
 *.jsonl
 *.jpg
+*.so

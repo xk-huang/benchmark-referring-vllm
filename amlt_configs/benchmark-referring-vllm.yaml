@@ -1,0 +1,128 @@
+env_defaults:
+  NUM_GPUS: 8
+  SHARED_CMD_ARGS: >
+    -m src.train
+    train_data='[vg-densecap-region_descriptions]' eval_data='[vg-densecap-region_descriptions]'
+    +model=base_sca
+    training.do_train=True
+    training.do_eval=True
+    training.do_inference=True
+    +data.streaming=False
+    training.max_eval_samples=800
+    training.max_steps=200000
+    training.fp16=True
+    model.cache_dir=/mnt/blob/weights/.model.cache/
+    training.save_strategy=steps
+    training.save_steps=5000
+    training.save_total_limit=3
+    training.optim=adamw_torch
+    training.evaluate_before_train=True
+    training.per_device_train_batch_size=1
+    training.evaluation_strategy=steps
+    training.eval_steps=5000
+    training.logging_steps=1000
+    training.logging_first_step=True
+    training.lr_scheduler_type=constant
+    training.warmup_steps=2000
+    training.learning_rate=1e-4
+    model.lm_head_model_name_or_path=gpt2-large
+    training.dataloader_num_workers=4
+    training.num_masks_per_sample=8
+    model.num_caption_tokens=8
+    training.output_dir=$AMLT_OUTPUT_DIR
+    training.output_log_dir=$AMLT_LOGS_DIR
+    wandb.group=$AMLT_EXPERIMENT_NAME-$AMLT_DESCRIPTION
+    wandb.name=$AMLT_JOB_NAME
+
+target:
+  service: singularity
+  # run "pt target list amlk8s" to list the names of available AMLK8S targets
+  # msrresrchvc, msrresrchws
+  # -t msrresrchvc -w msrresrchws
+  # -t msroctovc -w msroctows
+  # --sku G8-V100
+  name: msroctovc
+  workspace_name: msroctows
+
+environment:
+  # image: amlt-sing/ptca-1.13.1-cuda11.7
+  image: nvidia/pytorch:22.10-py3
+  registry: nvcr.io
+
+code:
+  local_dir: $CONFIG_DIR/../
+
+storage:
+  my_storage:
+    storage_account_name: zeliuwestus2
+    container_name: v-xiaokhuang
+    mount_dir: /mnt/blob
+    local_dir: /mnt/blob
+  onemodel:
+    storage_account_name: bingdatawu2
+    container_name: onemodel
+    mount_dir: /mnt/onemodel
+    local_dir: /mnt/onemodel
+    is_output: false
+  aml:
+    storage_account_name: zeliuwestus2
+    container_name: aml
+    mount_dir: /mnt/aml
+    local_dir: /mnt/aml
+    is_output: false
+
+jobs:
+  - name: debug
+    sku: G$NUM_GPUS
+    process_count_per_node: 1 # Each node should run 1 process
+    preemptible: False
+    command:
+      - . amlt_configs/setup-gpt4roi.sh
+      - source ~/.bashrc
+      - . amlt_configs/post_process.sh
+
+    submit_args:
+      env:
+        AZFUSE_USE_FUSE: "1"
+        SHARED_MEMORY_PERCENT: 0.5
+      container_args:
+        shm_size: 256g
+
+  - name: gpt4roi
+    sku: G$NUM_GPUS
+    process_count_per_node: 1 # Each node should run 1 process
+    preemptible: False
+    command:
+      - . amlt_configs/setup-gpt4roi.sh
+      - source ~/.bashrc
+      - >-
+        DATASET_LS=(
+        vg-densecap-local
+        refcocog-google
+        refcoco-unc-split_testA
+        refcoco-unc-split_testB
+        refcoco+-unc-split_testA
+        refcoco+-unc-split_testB
+        )
+      - >-
+        for DATASET in $${DATASET_LS[@]}; do
+            NUM_WORKERS=4 \
+            MODEL_TYPE='gpt4roi' \
+            CKPT_PATH='/mnt/blob/weights/GPT4RoI-7B' \
+            torchrun \
+                --standalone \
+                --nnodes=1 \
+                --nproc_per_node=$$(nvidia-smi -L | wc -l) \
+            -m src.eval \
+            eval_data=$$DATASET ;
+        done
+
+    submit_args:
+      env:
+        AZFUSE_USE_FUSE: "1"
+        SHARED_MEMORY_PERCENT: 0.5
+      container_args:
+        shm_size: 256g
+
+# amlt run -d "" amlt_configs/benchmark-referring-vllm.yaml :0 inferring-vllm --sku=G2-V100
+# amlt run -d "" amlt_configs/benchmark-referring-vllm.yaml :1 inferring-vllm --sku=G8-V100

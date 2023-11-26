@@ -1,28 +1,17 @@
-cd third_party/GPT4RoI/
-echo "pwd: $(pwd)"
+cd third_party/PVIT/
 
-pip install --upgrade pip  # enable PEP 660 support
-pip install setuptools_scm
-pip install --no-cache-dir  -e .
-# please use conda re-install the torch, pip may loss some runtime lib
-# conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia 
 
-pip install ninja
-pip install flash-attn --no-build-isolation
+cp requirements.txt requirements.txt.bak
+sed -i '3d' requirements.txt.bak
+sed -i '3d' requirements.txt.bak
+sed -i '3d' requirements.txt.bak
+pip install -r requirements.txt.bak
+git clone https://github.com/microsoft/RegionCLIP.git
+pip install -e RegionCLIP
 
-cd mmcv-1.4.7
-echo "pwd: $(pwd)"
-MMCV_WITH_OPS=1 pip install -e .
-cd ../../../
-echo "pwd: $(pwd)"
-
-pip install -r requirements.txt
-
-# NOTE: dependency hell.
 pip install pydantic==1.10.10
 
-# Remove the line 1271 in transformers/generation/utils.py for GPT4ROI
-sed -i '1271d' $(pip show transformers | grep Location | cut -d ' ' -f2)/transformers/generation/utils.py
+cd ../../
 
 # Add path of pip
 echo "export PATH=\$PATH:\$HOME/.local/bin" >> ~/.bashrc

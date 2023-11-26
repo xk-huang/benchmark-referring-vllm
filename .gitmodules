@@ -1,3 +1,6 @@
 [submodule "third_party/GPT4RoI"]
 	path = third_party/GPT4RoI
 	url = https://github.com/jshilong/GPT4RoI.git
+[submodule "third_party/PVIT"]
+	path = third_party/PVIT
+	url = https://github.com/PVIT-official/PVIT.git

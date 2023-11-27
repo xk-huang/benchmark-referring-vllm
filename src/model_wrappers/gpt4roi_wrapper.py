@@ -458,7 +458,7 @@ class GPT4ROIModelWrapper:
                     _id=region_cnt_base + region_cnt,
                     split="inference",
                     references=gt_caption_ls[region_cnt],
-                    candidate=[outputs],
+                    candidates=[outputs],
                     metadata=dict(
                         image_id=image_id,
                         bbox=raw_boxes[0],

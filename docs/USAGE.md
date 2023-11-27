@@ -45,3 +45,10 @@ for DATASET in ${DATASET_LS[@]}; do
     eval_data=$DATASET
 done
 ```
+
+
+## Evalute with `vdtk`
+
+```shell
+vdtk $METRIC_TYPE $JSON_PATH --split inference
+```

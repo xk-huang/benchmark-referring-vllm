@@ -90,3 +90,88 @@ git submodule add https://github.com/PVIT-official/PVIT.git third_party/PVIT
 
 . amlt_configs/setup-pvit.sh
 ```
+
+
+## Evaluate metrics with `vdtk`
+
+### Install `vdtk`
+
+Support CLIP computation with images encoded by base64.
+
+https://github.com/xk-huang/vdtk/tree/dev
+
+- data (e.g., jar files): https://huggingface.co/xk-huang/vdtk-data
+
+Install with external data:
+
+```shell
+ORIGINAL_DIR="$(pwd)"
+REPO_DIR=/tmp/vdtk
+git clone --recursive https://github.com/xk-huang/vdtk.git $REPO_DIR -b dev
+cd $REPO_DIR
+git submodule update --init --recursive
+
+apt-get update
+sudo apt-get update
+apt-get install git-lfs
+sudo apt-get install git-lfs
+
+git lfs install
+git clone https://huggingface.co/xk-huang/vdtk-data
+# git submodule init && git submodule update
+
+rsync -avP ./vdtk-data/vdtk .
+rm -rf vdtk-data
+
+pip install --upgrade pip
+pip install -e . POT==0.9.0  # POT=0.9.1 will take up all the memory with tf backend
+pip install tensorflow==2.12.1  # Just fix one version of tf
+pip install levenshtein==0.21.1
+pip install openpyxl==3.1.2
+
+python3 -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+cd "$ORIGINAL_DIR"
+```
+
+Potential Problems:
+
+- About Tensorflow: TF does not support CUDA 12 now (08/15/23). So we use `nvcr.io/nvidia/pytorch:22.12-py3` which contains CUDA 11.8.
+- Encoding in docker image: `import locale;locale.getpreferredencoding()` is `ANSI_X3.4-1968` rather than `UTF-8` which causes error in file writing.
+  - change `vdtk/metrics/tokenizer/ptbtokenizer.py:73`: `tmp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, encoding="utf-8")`
+
+
+### The format of input prediction json file
+
+```json
+[
+    {
+        "_id": 0,
+        "split": "inference",
+        "references": [
+            "red and yellow",
+            "red shirt guy",
+            "red and yellow uniform"
+        ],
+        "candidates": [
+            "a man wearing a red and white shirt"
+        ],
+        "metadata": {
+            "metadata_input_boxes": [
+                0,
+                95,
+                113,
+                419
+            ],
+            "metadata_image_id": 266240,
+            "metadata_region_id": 27287
+        },
+        "logits": {
+            "iou_scores": [
+                0.89990234375,
+                0.994140625,
+                0.99365234375
+            ]
+        }
+    }
+]
+```
